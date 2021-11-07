@@ -8,8 +8,8 @@ export class Server extends EventEmitter<ServerEvent> {
 	 * Constructor for creating a server. When consuming the Socks library, the
 	 * {@link Server.create} function should be preferred.
 	 * @param options The options for the server.
-	 * @param listener The factory function for creating a {@link Deno.Listener}
-	 * given some {@link Deno.ConnectOptions}.
+	 * @param listener The factory function for creating a @see Deno.Listener
+	 * given some @see Deno.ConnectOptions.
 	 * @
 	 */
 	constructor(
