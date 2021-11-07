@@ -6,11 +6,10 @@ import { ServerEvent, ServerEvents } from './events/server-events.ts';
 export class Server extends EventEmitter<ServerEvent> {
 	/**
 	 * Constructor for creating a server. When consuming the Socks library, the
-	 * {@link Server.create} function should be preferred.
+	 * `Server.create` function should be preferred.
 	 * @param options The options for the server.
-	 * @param listener The factory function for creating a @see Deno.Listener
-	 * given some @see Deno.ConnectOptions.
-	 * @
+	 * @param listener The factory function for creating a `Deno.Listener` given
+	 * some `Deno.ConnectOptions`.
 	 */
 	constructor(
 		private options: Deno.ConnectOptions,
@@ -20,9 +19,9 @@ export class Server extends EventEmitter<ServerEvent> {
 	}
 
 	/**
-	 * Creates a TCP server with the given @see Deno.ConnectOptions.
+	 * Creates a TCP server with the given `Deno.ConnectOptions`.
 	 * @param options The options for the server.
-	 * @returns The newly created @see Server object.
+	 * @returns The newly created `Server` object.
 	 */
 	public static create(options: Deno.ConnectOptions): Server {
 		return new Server(
@@ -71,7 +70,7 @@ export class Server extends EventEmitter<ServerEvent> {
 	 * @param client The client to close.
 	 * @returns Promise of the function eventually finalizing.
 	 */
-	closeClient(client: Client): Promise<void> {
+	public closeClient(client: Client): Promise<void> {
 		if (client.isOpen()) {
 			try {
 				client.close();

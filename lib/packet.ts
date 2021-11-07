@@ -1,5 +1,5 @@
 /**
- * A packet of data sent or received by a {@link Server} or {@link Client}.
+ * A packet of data sent or received by a `Server` or `Client`.
  */
 export class Packet {
   private data: Uint8Array;
@@ -17,7 +17,7 @@ export class Packet {
 
   /**
    * Get the underlying string for this packet's data using the provided decoder.
-   * @param decoder The {@link TextDecoder} implementation to use to decode the data.
+   * @param decoder The `TextDecoder` implementation to use to decode the data.
    */
   public toString(decoder: TextDecoder): string {
     return decoder.decode(this.data);
@@ -31,7 +31,7 @@ export class Packet {
   }
 
   /**
-   * Construct a new {@link Packet} from the provided string and encoder.
+   * Construct a new `Packet` from the provided string and encoder.
    * @param data The string to convert.
    * @param encoder The encoder to use to encode the string.
    */
@@ -40,7 +40,7 @@ export class Packet {
   }
 
   /**
-   * Construct a new {@link Packet} from the provided buffer array.
+   * Construct a new `Packet` from the provided buffer array.
    * @param data The buffer array to use.
    */
   public static fromBuffer(data?: Uint8Array): Packet {
@@ -48,9 +48,9 @@ export class Packet {
   }
 
   /**
-   * Construct a new {@link Packet} from the provided string and encoder.
+   * Construct a new `Packet` from the provided string and encoder.
    * @param data The string to use.
-   * @param encoder The {@link TextEncoder} implementation to use to encode the string.
+   * @param encoder The `TextEncoder` implementation to use to encode the string.
    */
   public static fromString(encoder: TextEncoder, data?: string): Packet {
     return new Packet(encoder.encode(data))

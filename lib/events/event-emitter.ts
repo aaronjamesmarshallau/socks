@@ -2,6 +2,9 @@
  * Strongly typed key class for the event emitter.
  */
 export interface EventKey {
+	/**
+	 * Retrieve the string implementation of our `EventKey`
+	 */
 	asString(): string;
 }
 
@@ -15,6 +18,9 @@ interface ListenerMap {
 export abstract class EventEmitter<T extends EventKey>  {
 	private listeners: ListenerMap;
 
+	/**
+	 * Initialize the EventEmitter base class.
+	 */
 	constructor() {
 		this.listeners = {};
 	}
