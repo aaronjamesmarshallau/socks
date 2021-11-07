@@ -4,17 +4,38 @@ import { EventEmitter } from './events/event-emitter.ts';
 import { ServerEvent, ServerEvents } from './events/server-events.ts';
 
 export class Server extends EventEmitter<ServerEvent> {
+	/**
+	 * Constructor for creating a server. When consuming the Socks library, the
+	 * {@link Server.create} function should be preferred.
+	 * @param options The options for the server.
+	 * @param listener The factory function for creating a {@link Deno.Listener}
+	 * given some {@link Deno.ConnectOptions}.
+	 * @
+	 */
 	constructor(
-		public options: Deno.ConnectOptions
+		private options: Deno.ConnectOptions,
+		private listener: (options: Deno.ConnectOptions & { transport?: "tcp" | undefined }) => Deno.Listener
 	) {
 		super();
+	}
+
+	/**
+	 * Creates a TCP server with the given @see Deno.ConnectOptions.
+	 * @param options The options for the server.
+	 * @returns The newly created @see Server object.
+	 */
+	public static create(options: Deno.ConnectOptions): Server {
+		return new Server(
+			options,
+			Deno.listen
+		)
 	}
 
 	/**
 	 * Start listening to the provided port for client connections.
 	 */
 	public async listen(): Promise<void> {
-		const server = Deno.listen(this.options);
+		const server = this.listener(this.options);
 		const clients: Array<Client> = [];
 
 		this.emit(ServerEvents.listen);
@@ -25,9 +46,12 @@ export class Server extends EventEmitter<ServerEvent> {
 
 			this.emit(ServerEvents.connect, client);
 
+			// Receive events for this client, but do not block.
 			client.receive()
 				.catch((err: Error) => this.emit(ServerEvents.error, err));
 
+			// When we get a close event for this client, finalise the client
+			// correctly.
 			client.on(ClientEvents.close, () => {
 				this.closeClient(client);
 
@@ -39,9 +63,14 @@ export class Server extends EventEmitter<ServerEvent> {
 			});
 		}
 
-		await Promise.resolve();
+		return Promise.resolve();
 	}
 
+	/**
+	 * Close the given client's connection to the server from our side.
+	 * @param client The client to close.
+	 * @returns Promise of the function eventually finalizing.
+	 */
 	closeClient(client: Client): Promise<void> {
 		if (client.isOpen()) {
 			try {

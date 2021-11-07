@@ -1,44 +1,13 @@
 import { assertEquals } from "https://deno.land/std@0.113.0/testing/asserts.ts";
-import randomBytes from 'https://deno.land/std@0.113.0/node/_crypto/randomBytes.ts';
-import { Buffer } from 'https://deno.land/std@0.113.0/io/buffer.ts';
 import { Client } from './client.ts';
 import { Packet } from './packet.ts';
-
-class MockConnection implements Deno.Reader, Deno.Closer, Deno.Writer {
-	private iteration = 0;
-	private bufferArray = new Uint8Array(0);
-	private data = new Buffer(this.bufferArray);
-
-	close(): void {
-		throw new Error("Method not implemented.");
-	}
-
-	read(p: Uint8Array): Promise<number|null> {
-		this.iteration++;
-		const bytes = randomBytes(p.byteLength);
-		p.set(bytes);
-
-		if (this.iteration > 5) {
-			throw new Error("blah");
-		}
-
-		return Promise.resolve(bytes.length);
-	}
-
-	write(p: Uint8Array): Promise<number> {
-		return this.data.write(p);
-	}
-
-	public getBuffer(): Buffer {
-		return this.data;
-	}
-
-}
+import { MockConnection } from './mocks/mock-connection.ts';
+import { ClientEvents } from "./events/client-events.ts";
 
 Deno.test({
 	name: "Client receive failures are handled",
 	fn: async () => {
-		const mockConn = new MockConnection();
+		const mockConn = new MockConnection(5);
 		const client = new Client(mockConn);
 
 		await client.receive()
@@ -104,5 +73,29 @@ Deno.test({
 	fn: async () => {
 		const client = new Client(undefined);
 		await client.write("test");
-	}
-})
+	},
+});
+
+Deno.test({
+	name: 'Client emits receive event on data',
+	fn: async () => {
+		const connection = new MockConnection(undefined, 5);
+		const client = new Client(connection);
+
+		const promise = new Promise((res, rej) => {
+			const timeout = setTimeout(() => {
+				rej(new Error("No data received before timeout."));
+			}, 500);
+
+			client.on(ClientEvents.receive, (_data: Packet) => {
+				clearTimeout(timeout);
+				res(undefined);
+			});
+		});
+
+		await Promise.all([
+			client.receive(),
+			promise,
+		]);
+	},
+});

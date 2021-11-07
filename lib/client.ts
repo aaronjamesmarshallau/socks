@@ -24,7 +24,7 @@ export class Client extends EventEmitter<ClientEvent> {
 
 	public async receive(): Promise<void> {
 		if (this.conn === undefined) {
-			return Promise.resolve();
+			return;
 		}
 
 		for await (const buffer of iterateReader(this.conn, { bufSize: 1024 })) {
@@ -36,7 +36,7 @@ export class Client extends EventEmitter<ClientEvent> {
 
 	public async write(data: Uint8Array | string | Packet): Promise<number> {
 		if (this.conn === undefined) {
-			return Promise.resolve(0);
+			return 0;
 		}
 
 		if (data instanceof Uint8Array) {
@@ -53,6 +53,6 @@ export class Client extends EventEmitter<ClientEvent> {
 			return await this.conn.write(data.toByteArray());
 		}
 
-		return Promise.resolve(0);
+		return 0;
 	}
 }

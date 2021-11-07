@@ -25,7 +25,7 @@ export abstract class EventEmitter<T extends EventKey>  {
 	 * @param callback The callback to fire when the event is emitted.
 	 */
 	public on(key: T, callback: (...args: any[]) => void): void {
-		if (this.listeners[key.asString()] === null) {
+		if (this.listeners[key.asString()] === undefined) {
 			this.listeners[key.asString()] = [];
 		}
 
